@@ -113,9 +113,17 @@ export default function Page() {
                   label=""
                   placeholder="Amount"
                   value={form.amount}
-                  onChangeText={(value) => setForm({ ...form, amount: value })}
+                  onChangeText={(value) => {
+                    const numericValue = parseFloat(value); // Convert the input to a number
+                    setForm({
+                      ...form,
+                      amount: value,
+                      status: numericValue < 0 ? "out" : "in", // Set status based on the amount
+                    });
+                  }}
                   keyboardType="numeric"
                 />
+
                 <InputField
                   label=""
                   placeholder="Category"

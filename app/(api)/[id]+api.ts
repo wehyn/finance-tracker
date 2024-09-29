@@ -32,7 +32,8 @@ export async function GET(request: Request, { id }: { id: string }) {
             SUM(CASE WHEN t.status = 'in' THEN t.amount ELSE -t.amount END) OVER () AS balance
             FROM users u
             JOIN transactions t ON u.id = t.user_id
-            WHERE u.clerk_id = ${id};
+            WHERE u.clerk_id = ${id}
+            ORDER BY t.date DESC;
         `;
 
     // If no transactions found, return a message
