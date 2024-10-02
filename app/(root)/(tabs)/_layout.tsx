@@ -1,4 +1,5 @@
 import { icons } from "@/constants";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { Tabs } from "expo-router";
 import React from "react";
 import { View, Image, ImageSourcePropType } from "react-native";
@@ -23,6 +24,7 @@ const TabIcon = ({
 );
 
 const Layout = () => (
+  <ActionSheetProvider>
   <Tabs
     initialRouteName="index"
     screenOptions={{
@@ -69,6 +71,7 @@ const Layout = () => (
       }}
     />
   </Tabs>
+  </ActionSheetProvider>
 );
 
 export default Layout;
