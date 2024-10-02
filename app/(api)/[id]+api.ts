@@ -13,6 +13,7 @@ export async function GET(request: Request, { id }: { id: string }) {
     const result = await sql`
             SELECT 
             u.id AS user_id,
+            t.id,
             t.date,
             t.category,
             t.amount,
