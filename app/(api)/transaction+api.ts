@@ -3,11 +3,10 @@ import { neon } from "@neondatabase/serverless";
 export async function POST(request: Request) {
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
-    const { user_id, transaction_id, date, category, amount, status} =
+    const { user_id, date, category, amount, status} =
       await request.json();
     if (
       !user_id ||
-      !transaction_id ||
       !date ||
       !category ||
       !amount ||
@@ -17,8 +16,8 @@ export async function POST(request: Request) {
     }
 
     const response = await sql`
-      INSERT INTO transactions (user_id, transaction_id, date, category, amount, status)
-      SELECT u.id, ${transaction_id}, ${date}, ${category}, ${amount}, ${status}
+      INSERT INTO transactions (user_id, date, category, amount, status)
+      SELECT u.id, ${date}, ${category}, ${amount}, ${status}
       FROM users u
       WHERE u.clerk_id = ${user_id}
       RETURNING *

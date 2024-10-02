@@ -1,13 +1,5 @@
 import { neon } from "@neondatabase/serverless";
 
-// Function to capitalize the first letter of each word
-function capitalizeWords(str) {
-  return str
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-}
-
 export async function GET(request: Request, { id }: { id: string }) {
   // Check for the required id parameter
   if (!id) {
@@ -21,10 +13,6 @@ export async function GET(request: Request, { id }: { id: string }) {
     const result = await sql`
             SELECT 
             u.id AS user_id,
-            u.name,
-            u.email,
-            u.clerk_id,
-            t.transaction_id,
             t.date,
             t.category,
             t.amount,
@@ -44,14 +32,7 @@ export async function GET(request: Request, { id }: { id: string }) {
       );
     }
 
-    // Format the result data
-    const formattedData = result.map(item => ({
-      ...item,
-      category: capitalizeWords(item.category), // Capitalize each word in the category
-      date: new Date(item.date).toISOString().split('T')[0] // Ensure date is a string in "YYYY-MM-DD" format
-    }));
-
-    return Response.json({ data: formattedData }, { status: 200 });
+    return Response.json({ data: result }, { status: 200 });
   } catch (error) {
     console.log(error);
     return new Response(JSON.stringify({ error: error }), { status: 500 });

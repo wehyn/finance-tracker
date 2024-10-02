@@ -10,12 +10,8 @@ const TabIcon = ({
   source: ImageSourcePropType;
   focused: boolean;
 }) => (
-  <View
-    className={`flex flex-row justify-center items-center rounded-full `}
-  >
-    <View
-      className={`rounded-full w-12 h-12 items-center justify-center`}
-    >
+  <View className={`flex flex-row justify-center items-center rounded-full `}>
+    <View className={`rounded-full w-12 h-12 items-center justify-center`}>
       <Image
         source={source}
         tintColor={focused ? "#0cc25f" : "white"}
