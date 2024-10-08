@@ -11,6 +11,14 @@ import { useCallback } from "react";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 
+interface Transaction {
+  id: number;
+  date: string;
+  amount: number;
+  status: string;
+  category: string;
+}
+
 export default function Page() {
   const [data, setData] = useState([]); // Store transactions
   const [balance, setBalance] = useState(0); // Store user's balance
@@ -29,29 +37,39 @@ export default function Page() {
     }
   };
 
-  const detailTransactions = (transactionId: number) => {
-    console.log(transactionId);
-    const options = ['Edit', 'Delete', 'Cancel'];
+  const detailTransactions = (transaction: Transaction) => {
+    const options = ["Edit", "Delete", "Cancel"];
     const destructiveButtonIndex = 1; // Index for "Delete"
     const cancelButtonIndex = 2; // Index for "Cancel"
 
-    showActionSheetWithOptions({
-      options,
-      cancelButtonIndex,
-      destructiveButtonIndex,
-    }, (i?: number) => {
-      const selectedIndex = i ?? -1; // Default to -1 if undefined
-      switch (selectedIndex) {
-        case 0: // Edit option
-          console.log(`Edit transaction ID: ${transactionId}`);
-          // Implement your edit logic here, e.g., navigate to edit screen
-          break;
-        case 1: // Delete option
-          console.log(`Delete transaction ID: ${transactionId}`);
-          // Implement your delete logic here
-          break;
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      (i?: number) => {
+        const selectedIndex = i ?? -1; // Default to -1 if undefined
+        switch (selectedIndex) {
+          case 0: // Edit option
+            router.push({
+              pathname: "/(root)/add-transaction",
+              params: {
+                id: transaction.id,
+                date: transaction.date,
+                amount: transaction.amount,
+                status: transaction.status,
+                category: transaction.category,
+              },
+            });
+            break;
+          case 1: // Delete option
+            console.log(`Delete transaction ID: ${transaction}`);
+            // Implement your delete logic here
+            break;
+        }
       }
-    });
+    );
   };
 
   // Load balance and transactions when the component mounts
@@ -87,52 +105,52 @@ export default function Page() {
   };
 
   return (
-      <SafeAreaView className="bg-tertiary h-full">
-        <View className="flex-col mt-3 mx-3">
-          <View className="flex flex-row justify-between items-center mb-3">
-            {/* Display balance */}
-            <Text className={`text-white font-JakartaBold text-2xl`}>
-              ₱{balance}
-            </Text>
-            <View>
-              <TouchableOpacity
-                onPress={() => {
-                  // Navigate to add transaction page
-                  router.push("/(root)/add-transaction");
-                }}
-                className="w-12 h-12 rounded-full bg-general-400 flex justify-center items-center pb-1"
-              >
-                <Text className="text-white font-JakartaExtraBold flex-row mt-2">
-                  <Image
-                    source={icons.plus}
-                    tintColor={"white"}
-                    className="w-7 h-7"
-                  />
-                </Text>
-              </TouchableOpacity>
-            </View>
+    <SafeAreaView className="bg-tertiary h-full">
+      <View className="flex-col mt-3 mx-3">
+        <View className="flex flex-row justify-between items-center mb-3">
+          {/* Display balance */}
+          <Text className={`text-white font-JakartaBold text-2xl`}>
+            ₱{balance}
+          </Text>
+          <View>
+            <TouchableOpacity
+              onPress={() => {
+                // Navigate to add transaction page
+                router.push("/(root)/add-transaction");
+              }}
+              className="w-12 h-12 rounded-full bg-general-400 flex justify-center items-center pb-1"
+            >
+              <Text className="text-white font-JakartaExtraBold flex-row mt-2">
+                <Image
+                  source={icons.plus}
+                  tintColor={"white"}
+                  className="w-7 h-7"
+                />
+              </Text>
+            </TouchableOpacity>
           </View>
-
-          {/* Display Recent Transactions */}
-          <FlatList
-            data={groupTransactionsByDate(data)} // Render the updated grouped transaction data
-            renderItem={({ item }) => (
-              <TransactionCard 
-                group={item} 
-                onPress ={(transactionId) => detailTransactions(transactionId)} // Pass transaction ID to detail function
-              />
-            )}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: 100 }}
-            ListHeaderComponent={() => (
-              <View className="flex flex-row items-center justify-between">
-                <Text className="text-white font-JakartaSemiBold mt-5">
-                  Recent Transactions:{" "}
-                </Text>
-              </View>
-            )}
-          />
         </View>
-      </SafeAreaView>
+
+        {/* Display Recent Transactions */}
+        <FlatList
+          data={groupTransactionsByDate(data)} // Render the updated grouped transaction data
+          renderItem={({ item }) => (
+            <TransactionCard
+              group={item}
+              onPress={(transactionId) => detailTransactions(transactionId)} // Pass transaction ID to detail function
+            />
+          )}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 100 }}
+          ListHeaderComponent={() => (
+            <View className="flex flex-row items-center justify-between">
+              <Text className="text-white font-JakartaSemiBold mt-5">
+                Recent Transactions:{" "}
+              </Text>
+            </View>
+          )}
+        />
+      </View>
+    </SafeAreaView>
   );
 }

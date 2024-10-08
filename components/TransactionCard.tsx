@@ -15,9 +15,8 @@ interface TransactionGroup {
   totalAmount: number;
 }
 
-const TransactionCard = ({ group, onPress }: { group: TransactionGroup, onPress: (id: number) => void}) => {
+const TransactionCard = ({ group, onPress }: { group: TransactionGroup, onPress: (transaction: Transaction) => void}) => {
   const { date, transactions } = group;
-  console.log(group);
 
   return (
     <View className="bg-[#27292e] rounded-xl p-4 mt-3">
@@ -32,7 +31,7 @@ const TransactionCard = ({ group, onPress }: { group: TransactionGroup, onPress:
 
       {/* Render Each Transaction */}
       {transactions.map((transaction) => (
-        <TouchableOpacity onPress={() => onPress(transaction.id)}>
+        <TouchableOpacity onPress={() => onPress(transaction)}>
           <View
             key={transaction.id}
             className="flex-row justify-between items-center mb-2"

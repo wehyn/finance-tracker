@@ -3,8 +3,8 @@ import InputField from "@/components/InputField";
 import { icons } from "@/constants";
 import { fetchAPI } from "@/lib/fetch";
 import { useUser } from "@clerk/clerk-expo";
-import { router } from "expo-router";
-import { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useState, useEffect } from "react";
 import {
   Image,
   View,
@@ -17,6 +17,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePickerModal from "react-native-modal-datetime-picker"; // Import DateTimePickerModal
 
 const AddTransaction = () => {
+  const transaction = useLocalSearchParams();
+  const [isEditing, setIsEditing] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false); // Control date picker visibility
   const { user } = useUser(); // Get the user from Clerk
   const [form, setForm] = useState({
@@ -25,6 +27,48 @@ const AddTransaction = () => {
     date: new Date(),
     status: "",
   });
+
+  useEffect(() => {
+    if (transaction.id) {
+      const amountValue = Array.isArray(transaction.amount)
+        ? transaction.amount[0]
+        : transaction.amount;
+
+      const categoryValue = Array.isArray(transaction.category)
+        ? transaction.category[0]
+        : transaction.category;
+
+      const dateValue = Array.isArray(transaction.date)
+        ? new Date(transaction.date[0])
+        : new Date(transaction.date);
+
+      const statusValue = Array.isArray(transaction.status)
+        ? transaction.status[0]
+        : transaction.status;
+
+      const newForm = {
+        amount: amountValue || "",
+        category: categoryValue || "",
+        date: dateValue || new Date(),
+        status: statusValue || "",
+      };
+
+      // Only update if the form has actually changed
+      if (JSON.stringify(newForm) !== JSON.stringify(form)) {
+        setForm(newForm);
+        setIsEditing(true);
+      }
+    } else if (isEditing) {
+      // Only reset if we were previously editing
+      setForm({
+        amount: "",
+        category: "",
+        date: new Date(),
+        status: "",
+      });
+      setIsEditing(false);
+    }
+  }, [transaction, isEditing]); // Add transaction as a dependency
 
   const addTransaction = async () => {
     try {
@@ -39,7 +83,6 @@ const AddTransaction = () => {
         }),
       });
       // Refetch the transactions after adding a new one
-
     } catch (error) {
       console.error(error);
     }
@@ -125,7 +168,7 @@ const AddTransaction = () => {
               />
 
               <CustomButton
-                title="Done"
+                title={isEditing ? "Update" : "Done"}
                 onPress={() => {
                   addTransaction(); // Add transaction
                   setForm({
