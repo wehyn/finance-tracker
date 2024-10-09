@@ -30,10 +30,22 @@ export default function Page() {
     try {
       const response = await fetch(`/(api)/${id}`);
       const data = await response.json();
-      setData(data.data); // Update the transaction list
-      setBalance(data.data[0]?.balance || 0); // Update the balance if available
+
+      if (response.ok) {
+        // Check for a successful response
+        setData(data.data || []); // Ensure data is an array
+        setBalance(data.data[0].balance || 0); // Update the balance if available
+      } else {
+        console.error(
+          `Error fetching transactions: ${data.message || "Unknown error"}`
+        );
+        setData([]); // Reset data on error
+        setBalance(0); // Reset balance on error
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Fetch error:", error);
+      setData([]); // Reset data on error
+      setBalance(0); // Reset balance on error
     }
   };
 
@@ -44,13 +56,13 @@ export default function Page() {
         method: "DELETE",
         headers: new Headers({
           "Content-Type": "application/json",
-          "user_id": userId || "",
-        })
+          user_id: userId || "",
+        }),
       });
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const detailTransactions = (transaction: Transaction) => {
     const options = ["Edit", "Delete", "Cancel"];
@@ -80,7 +92,9 @@ export default function Page() {
             break;
           case 1: // Delete option
             deleteTransactions(transaction.id);
-            if (user?.id) { getTransactions(user.id) }
+            if (user?.id) {
+              getTransactions(user.id);
+            }
             break;
         }
       }
