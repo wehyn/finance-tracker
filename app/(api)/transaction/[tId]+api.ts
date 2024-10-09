@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import { useUser } from "@clerk/clerk-expo";
 
 export async function PUT(request: Request, { tId }: { tId: string }) {
   // Check if the transaction ID is provided
@@ -45,7 +46,6 @@ export async function PUT(request: Request, { tId }: { tId: string }) {
 
 export async function GET(request: Request, { tId }: { tId: string }) {
   
-  const id: string = 'user_2mFBTotfvYbs69XhxTcB5IFzHaN'
 
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
@@ -61,7 +61,6 @@ export async function GET(request: Request, { tId }: { tId: string }) {
             SUM(CASE WHEN t.status = 'in' THEN t.amount ELSE -t.amount END) OVER () AS balance
             FROM users u
             JOIN transactions t ON u.id = t.user_id
-            WHERE u.clerk_id = ${id}
             AND t.id = ${tId}
             ORDER BY t.date DESC;
         `;
@@ -69,5 +68,40 @@ export async function GET(request: Request, { tId }: { tId: string }) {
     return Response.json({ data: result[0] }, { status: 200 });
   } catch (error) {
     console.error(error);
+  }
+}
+
+export async function DELETE(request: Request, { tId }: { tId: string }) {
+
+
+
+  if (!tId) {
+    return Response.json("Missing required fields", { status: 400 });
+  } 
+
+  try {
+    const sql = neon(`${process.env.DATABASE_URL}`);
+    const id = request.headers.get("user_id");
+
+    // Delete the transaction from the database
+    const result = await sql`
+      DELETE FROM transactions
+      WHERE id = ${tId} AND user_id = (SELECT id FROM users WHERE clerk_id = ${id})
+      RETURNING *;  -- This returns the deleted transaction
+    `;
+
+    // Check if the transaction was deleted
+    if (result.length === 0) {
+      return Response.json(
+        { message: "Transaction not found." },
+        { status: 404 }
+      );
+    }
+
+    // Return a success message
+    return Response.json({ message: "Transaction deleted successfully." }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ error: error }), { status: 500 });
   }
 }
