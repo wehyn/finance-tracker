@@ -1,5 +1,5 @@
 import { formatDate } from "@/lib/utils";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 
 interface Transaction {
   id: number;
