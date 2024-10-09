@@ -24,7 +24,7 @@ const TransactionCard = ({ group, onPress }: { group: TransactionGroup, onPress:
       <View className="flex-row justify-between items-center mb-4">
         <View className="flex-row items-center">
           <View>
-            <Text className="text-gray-400">{formatDate(date)}</Text>
+            <Text className="text-gray-400 font-JakartaSemiBold">{formatDate(date)}</Text>
           </View>
         </View>
       </View>
@@ -37,7 +37,7 @@ const TransactionCard = ({ group, onPress }: { group: TransactionGroup, onPress:
             className="flex-row justify-between items-center mb-2"
           >
             <View className="flex-row items-center">
-              <Text className="text-white capitalize font-JakartaBold">
+              <Text className="text-white capitalize font-Jakarta">
                 {transaction.category}
               </Text>
             </View>
