@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePickerModal from "react-native-modal-datetime-picker"; // Import DateTimePickerModal
@@ -73,6 +74,7 @@ const AddTransaction = () => {
     }
   }, [transaction.id]); // Add transaction as a dependency 
 
+  // Add Transaction
   const addTransaction = async () => {
     try {
       await fetchAPI("/(api)/transaction", {
@@ -91,6 +93,7 @@ const AddTransaction = () => {
     }
   };
 
+  // Edit Transaction
   const editTransaction = async (id: string) => {
     try {
       await fetchAPI(`/(api)/transaction/${id}`, {
@@ -190,6 +193,7 @@ const AddTransaction = () => {
               <CustomButton
                 title={isEditing ? "Update" : "Done"}
                 onPress={() => {
+                  Keyboard.dismiss();
                   isEditing ? editTransaction(transactionId) : addTransaction();
                   setForm({
                     amount: "0",
