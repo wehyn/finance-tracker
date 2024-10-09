@@ -37,6 +37,21 @@ export default function Page() {
     }
   };
 
+  const deleteTransactions = async (tId: number) => {
+    try {
+      const userId = user?.id;
+      const response = await fetch(`/(api)/transaction/${tId}`, {
+        method: "DELETE",
+        headers: new Headers({
+          "Content-Type": "application/json",
+          "user_id": userId || "",
+        })
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const detailTransactions = (transaction: Transaction) => {
     const options = ["Edit", "Delete", "Cancel"];
     const destructiveButtonIndex = 1; // Index for "Delete"
@@ -64,8 +79,8 @@ export default function Page() {
             });
             break;
           case 1: // Delete option
-            console.log(`Delete transaction ID: ${transaction}`);
-            // Implement your delete logic here
+            deleteTransactions(transaction.id);
+            if (user?.id) { getTransactions(user.id) }
             break;
         }
       }
