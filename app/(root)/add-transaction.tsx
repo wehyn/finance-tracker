@@ -28,6 +28,10 @@ const AddTransaction = () => {
     status: "",
   });
 
+  const transactionId = Array.isArray(transaction.id)
+        ? transaction.id[0]
+        : transaction.id;
+
   useEffect(() => {
     if (transaction.id) {
       const amountValue = Array.isArray(transaction.amount)
@@ -52,7 +56,7 @@ const AddTransaction = () => {
         date: dateValue || new Date(),
         status: statusValue || "",
       };
-
+      console.log("test");
       // Only update if the form has actually changed
       if (JSON.stringify(newForm) !== JSON.stringify(form)) {
         setForm(newForm);
@@ -66,9 +70,8 @@ const AddTransaction = () => {
         date: new Date(),
         status: "",
       });
-      setIsEditing(false);
     }
-  }, [transaction, isEditing]); // Add transaction as a dependency
+  }, [transaction.id]); // Add transaction as a dependency 
 
   const addTransaction = async () => {
     try {
@@ -83,6 +86,23 @@ const AddTransaction = () => {
         }),
       });
       // Refetch the transactions after adding a new one
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const editTransaction = async (id: string) => {
+    try {
+      await fetchAPI(`/(api)/transaction/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          user_id: user?.id,
+          date: form.date,
+          category: form.category,
+          amount: form.amount,
+          status: form.status,
+        }),
+      });
     } catch (error) {
       console.error(error);
     }
@@ -170,14 +190,15 @@ const AddTransaction = () => {
               <CustomButton
                 title={isEditing ? "Update" : "Done"}
                 onPress={() => {
-                  addTransaction(); // Add transaction
+                  isEditing ? editTransaction(transactionId) : addTransaction();
                   setForm({
                     amount: "0",
                     category: "",
                     date: new Date(),
                     status: "",
-                  }); // Clear form
-                  router.back(); // Redirect to the home page
+                  }); 
+                  router.back(); 
+                  setIsEditing(false);
                 }}
                 className="mt-2 bg-success-500 mb-5"
               />

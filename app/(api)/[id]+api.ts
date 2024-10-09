@@ -22,7 +22,7 @@ export async function GET(request: Request, { id }: { id: string }) {
             FROM users u
             JOIN transactions t ON u.id = t.user_id
             WHERE u.clerk_id = ${id}
-            ORDER BY t.date DESC;
+            ORDER BY t.date DESC, t.id DESC;
         `;
 
     // If no transactions found, return a message
